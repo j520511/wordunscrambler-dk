@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ord Unscrambler – Find Danske Ord | WordUnscrambler.dk</title>
+<meta name="description" content="Bland dine bogstaver og find øjeblikkeligt alle mulige danske ord. Gratis værktøj til Scrabble, Wordfeud og krydsord.">
+<meta name="keywords" content="ord unscrambler, ord med bogstaver, anagram dansk, scrabble hjælp, find ord">
+<link rel="canonical" href="https://wordunscrambler.dk/">
+<style>
+  :root {
+    --primary: #c60c30;
+    --primary-dark: #a00026;
+    --accent: #c60c30;
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --success: #16a34a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+  header { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); color: white; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  header h1 { font-size: 1.5rem; font-weight: 700; }
+  header span { font-size: 0.85rem; opacity: 0.75; }
+  .hero { background: linear-gradient(135deg, var(--primary) 0%, #e01040 100%); color: white; padding: 3rem 1.5rem 4rem; text-align: center; }
+  .hero h2 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.75rem; line-height: 1.2; }
+  .hero p { font-size: 1.1rem; opacity: 0.9; max-width: 520px; margin: 0 auto 2rem; }
+  .search-box { background: white; border-radius: 16px; padding: 1.5rem; max-width: 600px; margin: 0 auto; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+  .input-row { display: flex; gap: 0.75rem; margin-bottom: 0.75rem; }
+  .input-row input { flex: 1; padding: 0.9rem 1.2rem; border: 2px solid var(--border); border-radius: 10px; font-size: 1.2rem; letter-spacing: 0.1em; text-transform: uppercase; outline: none; transition: border-color 0.2s; color: var(--text); }
+  .input-row input:focus { border-color: var(--primary); }
+  .input-row input::placeholder { text-transform: none; letter-spacing: 0; color: #aaa; font-size: 1rem; }
+  .btn-primary { padding: 0.9rem 1.8rem; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s; white-space: nowrap; }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .options-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .options-row label { font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+  .options-row select { padding: 0.4rem 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; }
+  .filters-row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+  .filters-row label { font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 0.4rem; }
+  .filter-input { width: 65px; padding: 0.4rem 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .filter-input:focus { outline: none; border-color: var(--primary); }
+  main { max-width: 900px; margin: -2rem auto 0; padding: 0 1.5rem 4rem; position: relative; z-index: 1; }
+  #results-area { display: none; }
+  .results-header { background: var(--card); border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; }
+  .results-header h3 { font-size: 1.1rem; }
+  .results-header span { font-size: 0.9rem; color: var(--muted); }
+  .length-tabs { background: var(--card); border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; white-space: nowrap; }
+  .tab-btn { display: inline-block; padding: 0.4rem 1rem; margin-right: 0.4rem; border: 2px solid var(--border); border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; background: white; color: var(--muted); transition: all 0.15s; }
+  .tab-btn.active, .tab-btn:hover { background: var(--primary); border-color: var(--primary); color: white; }
+  .words-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.6rem; }
+  .word-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.8rem; font-size: 0.95rem; font-weight: 600; text-align: center; cursor: pointer; transition: all 0.15s; }
+  .word-card:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(198,12,48,0.15); }
+  .word-card .pts { font-size: 0.7rem; color: var(--muted); font-weight: 400; }
+  .section-title { font-size: 1rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin: 1.5rem 0 0.75rem; padding-left: 0.25rem; }
+  .no-results { background: var(--card); border-radius: 12px; padding: 3rem; text-align: center; color: var(--muted); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .no-results h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text); }
+  .info-section { background: var(--card); border-radius: 12px; padding: 2rem; margin-top: 3rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .info-section h2 { font-size: 1.4rem; margin-bottom: 1rem; color: var(--primary); }
+  .info-section p { color: var(--muted); line-height: 1.7; margin-bottom: 0.75rem; }
+  .faq-item { margin-bottom: 1.5rem; }
+  .faq-item h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .faq-item p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+  .copy-toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--success); color: white; padding: 0.7rem 1.5rem; border-radius: 30px; font-weight: 600; transition: transform 0.3s; z-index: 100; }
+  .copy-toast.show { transform: translateX(-50%) translateY(0); }
+  footer { background: var(--primary-dark); color: rgba(255,255,255,0.7); text-align: center; padding: 2rem; font-size: 0.85rem; }
+  footer a { color: rgba(255,255,255,0.9); text-decoration: none; }
+  @media(max-width:600px) { .hero h2 { font-size: 1.6rem; } .input-row { flex-direction: column; } .words-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔤 WordUnscrambler<span style="color:#fff9">.dk</span></h1>
+  <span>Ord unscrambler på dansk</span>
+</header>
+
+<div class="hero">
+  <h2>Bland Bogstaver på Dansk</h2>
+  <p>Indtast dine blandede bogstaver og find øjeblikkeligt alle mulige danske ord.</p>
+  <div class="search-box">
+    <div class="input-row">
+      <input type="text" id="letterInput" placeholder="f.eks. TSENE → STENE" maxlength="15" autocomplete="off" spellcheck="false">
+      <button class="btn-primary" onclick="unscramble()">Søg</button>
+    </div>
+    <div class="options-row">
+      <label>Længde: <select id="lengthFilter" onchange="filterByLength()">
+        <option value="all">Alle</option>
+      </select></label>
+      <label><input type="checkbox" id="exactOnly"> Kun nøjagtig længde</label>
+      <label style="margin-left:auto; color: var(--primary); font-weight:600;" id="wordCount"></label>
+    </div>
+    <div class="filters-row">
+      <label>Starter med: <input type="text" id="startsWith" class="filter-input" maxlength="3" placeholder="A…" autocomplete="off"></label>
+      <label>Slutter på: <input type="text" id="endsWith" class="filter-input" maxlength="3" placeholder="…E" autocomplete="off"></label>
+      <label>Indeholder: <input type="text" id="contains" class="filter-input" maxlength="3" placeholder="ST" autocomplete="off"></label>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div id="results-area">
+    <div class="results-header">
+      <h3 id="results-title">Resultater</h3>
+      <span id="results-meta"></span>
+    </div>
+    <div class="length-tabs" id="length-tabs"></div>
+    <div id="words-container"></div>
+  </div>
+  <div id="no-results" style="display:none" class="no-results">
+    <h3>Ingen ord fundet</h3>
+    <p>Prøv andre bogstaver eller tjek stavningen.</p>
+  </div>
+
+  <div class="info-section">
+    <h2>Hvordan fungerer ord-unscramblereren?</h2>
+    <p>Vores gratis værktøj gennemgår mere end 80.000 danske ord på millisekunder. Indtast blot dine blandede bogstaver — algoritmen tester alle mulige kombinationer og viser alle gyldige ord, sorteret efter længde og Scrabble-score.</p>
+    <p>Perfekt til <strong>Scrabble</strong>, <strong>Wordfeud</strong>, <strong>krydsord</strong>, <strong>anagrammer</strong> og alle andre ordspil på dansk.</p>
+    <div class="faq-item" style="margin-top:1.5rem">
+      <h3>Hvad bruges ord-unscramblereren til?</h3>
+      <p>Den hjælper dig med at løse anagrammer, finde ord til Scrabble, udfylde krydsord og vinde alle dine favoritordspil.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Understøttes specialtegn?</h3>
+      <p>Ja! Du kan skrive æ, ø og å direkte eller bruge ae, oe og aa som erstatning.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Hvor mange ord er der i ordbogen?</h3>
+      <p>Vores danske ordbog indeholder mere end 80.000 almindelige ord fra standarddansk.</p>
+    </div>
+  </div>
+</main>
+
+<div class="copy-toast" id="toast">✓ Kopieret!</div>
+
+<footer>
+  <p>© 2026 WordUnscrambler.dk – Ord unscrambler på dansk</p>
+  <p style="margin-top:0.5rem">
+    <a href="https://wordunscrambler.de">🇩🇪 Deutsch</a> &nbsp;|&nbsp;
+    <a href="https://wordunscrambler.fr">🇫🇷 Français</a> &nbsp;|&nbsp;
+    <a href="https://wordunscrambler.it">🇮🇹 Italiano</a> &nbsp;|&nbsp;
+    <a href="https://wordunscrambler.nl">🇳🇱 Nederlands</a> &nbsp;|&nbsp;
+    <a href="https://wordunscrambler.be">🇧🇪 Belgique</a>
+  </p>
+  <p style="margin-top:0.5rem;font-size:0.8rem"><a href="/privacy.html">Privatlivspolitik</a></p>
+</footer>
+
+<script>
+const WORDS = `aas abe abel aber abet abid abin ablo abne abod abom abor abos abot abru
+aces acle acne acor acre acro acte acyl adam adas adel adem aden ades
+adet adig adir adis adne ados ager ages agil agis agit agiv agod agor
+agu aids ails aine ains aire airs airt airy aits ajos akel aker akes
+akke aks akt ale alen ales alfa alge algi alim alin alis alit aller
+alme almo alne alod alog alok alom alon alor alos alot aler alre als
+also alst alsu alte alun alve alvi alvo alys amor amps ande anel anes
+ang ange angi angs anil anis ankre anno ante anto ants anus bade bads
+bager bane band bare barm barm bars bas base bat bede beef beer beet
+bel bele bele bels belt ben bend bene bens bent ber bere bers best bete
+bier bil bile bils bind bine bird bist bite bive blad blade blag blak
+blan blas blase bleg blen bles blid blik blind blis blit blob blod blom
+blon blot blov blud bode bog bold bole bolg bolt bom bone bons bont bond
+book bor bord bore borg born bors bort bos bost bot bote bots bov bove
+brag bram bran bras brat bred bref brel brem bres bret brim brin broe
+brok brom bron brui brul brum brus brud brun brus bud bug buge buk
+bul bulg bund bunt bure burg burk burs busk dag dale dam dans daos darn
+dat dato dav dav dave davn ded deft den dens dent dep ders det dets
+deus devs drik drom dru drug drum dud dug dun dune duo dur dure dusk
+ede edit edler edre eds eel efn ege egn egl egne ego egr eje ejer eks
+eld els elsd emen emne ems ende ener enev enig enke enke ens ense ensi
+entrer er ered erem eres ergy erik erin eris ern erne ernes erred erts
+eser eses esne eter etik etim etis etne etor etsk etst eure eves evid
+fag fakk fald fale falk fals fame fane fang farv fat fate fave favn
+fede felt fend fene fens fer ferd fere feri fern fest fets filer film
+filt find fine fint firs fise fisk fist fite flab flad flak flan flas
+flav flid flis flit flod flog flok flom flon floo flor flos flot flov
+flue flyt fob fode fog fol folg fole foln fols fon fond ford fore fork
+form forn fort fos fot fove fred frem fres frib frik frin fris frit
+gaas gade gaf gag gal gale galg galm gam gang gar garn gast gat gave
+gavn ged gede gel geld gele gele gelg gels gem geni gens gent ger gere
+gide gig gild gilt gin gind gins gist git give glad glas glat glid glin
+glob glor glos glot glud god gods gode gofs gol golf gom gong gons gord
+gore gork gorm gorr gors goru grab gram gras grat gren grep grev grib
+grim grin griv grom gron grop gros grot grub grum grun hake halm hals
+ham hang har hard hare hark harn hars hast hat have havn hede hekt held
+helg helm hels hem hend hens herd hert hi hike hild hile hins hird hire
+hirt hist hit hoek hoed hoer hofs hok hold hole holm hols holt home hond
+hons horn hors hort host hove hres hulk hul hule hulk huls hult hun hund
+hune hung huns hunt hurd hure husl husk hval hvid hvil hvin hvis hvob
+hyre hyse idol idyl ikse ilde ilen iles ilet ilsk imse inde iner ines
+ines infam inge insk isle ist iste ivrig jade jage jagt jans jarv jern
+jet jog jord jude jule jung jure kage kalk kam kan kand kane kant kap
+karm karv kase kast kat kate kede kedt keg keis kel kele kelg kels kelt
+kend kere kern kes kes ket kig kilg kile kilk kilm kilp kilt kind kine
+kir kirk kirs kirt kist kite kive kjol klar klat kled klem klen kling
+klip klis klit kloe klog klok klom klos klot klud klup knap knar kned
+knel kner knet knid knie knip knis kniv knop knor knot knud kod kode
+koge kogt kol kolg kolk kols kolt kome koms kond kone kong kons kont
+kop kor kord korm kors kost kot kove krads kram krans krat krav kred
+krig krim krip krod krog kron krop krot krue krul krus kryb kryd kryn
+lag lake lam lamb lamp lar larm lars lart las last lat lave lavt led
+lede leds ledst leg lege lem lems lend lene leng lens lent ler lerd lere
+les lest lets lid lids lide lids lidt lif lift lig ligs liga ligb lik
+lim lime limp lin lind lind line ling link linv lirs list lit lits live
+lod lode lods lodsk log loge logn lok lold lole loll lols lolt lom long
+los losi lost lot lots love lovs lud lug luis luk lule luls lult lum
+lund lung lur lure lurk lus lusb lusk lust mag main mak mal mals malt
+mam mane mang mank mals mark mars mash mast mat mate mave med mel meld
+melg mels melt men mend mene meng men mens mers mert mes mest met mete
+mig mis mist mit mite mode mol mole molt mond mone mono mont morg morm
+nag nak nal nam nap nar nard nare nars nart nas nat nave navn ned nede
+neds nert nese nest net nets neve nid nide nids nift nig nim niml nim
+nip nire nirs nirt nit nits nob nod node nods nodsk noel nog nom nome
+noms nond none nons nont nor nord nore nork norm norn norp nors nort
+ode ode ogen oler oles olg olm ols olt ord orde ordg orm ors ort orts
+over pad pak pal pale palg pals palt pam pan pand pane pang pans pant
+par pard pare park parv pas past pat pave pavn peds pele pels pelt pen
+pend pene peng pens pent per perd pere perg perk perm pers pert pet
+pig pig pile pin pind pine ping pink pins pint pire pirs pirt pis pisg
+plad plak plag plan plat plid plik plim plip plis plit plod plok plom
+plop plot plov plud plug plum plun plup plur plus rade rake ram rang rap
+raps rare rart ras rask rast rat rave ravl ravs reb red rede ref reg
+rem rems rend rene reng rens rent rep res rest ret rete rets rev ride
+ridg rim riml rims rimt rin rind rine ring rins rint rip rise rism rist
+rod rode rods rodsk rog rog rok rol rold role rolf rolk rols rolt rom
+rond rone rong rons ront ror rore rorm rors rort ros rose ross rove rubm
+rud rude ruds rudsk rug rugs rugv ruin ruml rums run rund rune rung run
+sag sals salt sam sand sang sans sap sar sard sare sark sars sart sas
+sed sel selg sels selt sen send sene seng sens sent sep ser serd serg
+sers sert ses sese sest set sets sig sil silk silm sils silt sind sine
+sing sink sins sint sip sire sirs sirt sis sisk sist sit site sits
+sjal sjap sjov skabt skaf skag skal skan skap skar skas skat skav sked
+skel sken skib skid skie skif skig skik skil skim skip skis skit skiv
+sku slad slag slak slam slap slav sled slef sleg slem slev slid slim slip
+slis slit slod olog slok slom slon slop slos slot slug slum slup slut
+smed smel smer smes smet smod smog smol smon smor smot smud snag snak
+snar sned snel snig snip snis snit snog snol snor snot snov snub snus
+sol sole sold solf sols solt som some song sons sont sop sor sord sore
+sork sorm sort sos sose sost sot sove spa spak span spar spas spat sped
+spid spil spin spir spis spit spiv sple spod spog spok spol spom spon
+spor spot spov spu stad stal stam stan stap star stas stat stav sted
+stel stem sten steg stie stik stil stim stip stir stob stod stof stog
+stok stol stom ston stop stor stov streg strik strom strop strue stud
+stuf stuk stun stup stur stut subb suld sule sulk sum sund sung sunk
+super sur sure surt sus tabt tage takt tal talg tals talt tam tand tane
+tang tank tans tant tap taps tar tard tare tark tars tart tes test tet
+tid tide tidg tids tidt tig tige tigl tigs tigt til tils tilt tim time
+tin tind tine ting tink tins tint tip tirs tirt tis tisk tisl tism tist
+tog togs togv tom tome toms tomt ton tond tone tong tons tont top tops
+tor tord tore tork torm tors tort tos tose tost tot tov trag trak tral
+tram trap tras trav tre tred trek tren tres trev trig trim trip triv
+tro trod trog trom tron trop tros trot trov trum trun trus trut tug tulg
+tung tuns tur turd ture turk turs turt tyl tyre ude udk uds udt uge ugl
+ugle ugls ulk ulm uls ult ulv und unde unel unes ungl unk unl unm uns
+unt upl upm ups upt ulv vals van vand vane vang vans vant var vare varm
+vars vart vas vase vav ved vede veds vedt ves vest vin vind vine ving
+vink vins vint vir vire virg virk virs virt vis vise visg visk vism viss
+vist vit vive vlad vob vod vog vok vol vold vole volf volk vols volt
+voms vand varg vars vask vred vrid vrin vrop vrug ybe yds yme yrs yde
+yde ydm yds yng ynk yns æde ædt ær ære ærk ærl ærs ært øde ødm
+ødsk øg øge øgl øgn øgt øje øl øld øle ølg øls ølt øm ørk øse
+øsl øst øsv øv åben ånd åre`;
+
+const rawWords = WORDS.toLowerCase().replace(/[^a-zæøå\s]/g,'').split(/\s+/).filter(w=>w.length>=2);
+const WORD_SET = [...new Set(rawWords)];
+
+const SCORES = {a:1,b:3,c:8,d:2,e:1,f:3,g:3,h:4,i:1,j:4,k:3,l:2,m:3,n:1,o:2,p:3,q:10,r:1,s:1,t:1,u:4,v:4,w:8,x:8,y:6,z:8,æ:4,ø:3,å:4};
+
+function letterScore(word){ return [...word].reduce((s,c)=>s+(SCORES[c]||0),0); }
+
+function normalize(s){
+  return s.toLowerCase()
+    .replace(/ae/g,'æ').replace(/oe/g,'ø').replace(/aa/g,'å')
+    .trim();
+}
+
+function canMake(word, letters) {
+  const avail = {};
+  for(const c of letters) avail[c]=(avail[c]||0)+1;
+  for(const c of word){
+    if(avail[c]){avail[c]--;continue;}
+    return false;
+  }
+  return true;
+}
+
+let allResults = {};
+
+function unscramble(){
+  const raw=document.getElementById('letterInput').value.toLowerCase().trim();
+  const letters=normalize(raw).replace(/[^a-zæøå]/g,'');
+  if(!letters) return;
+  const exactOnly=document.getElementById('exactOnly').checked;
+  const sw=normalize(document.getElementById('startsWith').value).trim();
+  const ew=normalize(document.getElementById('endsWith').value).trim();
+  const cw=normalize(document.getElementById('contains').value).trim();
+  const found=WORD_SET.filter(w=>{
+    if(exactOnly && w.length!==letters.length) return false;
+    if(sw && !w.startsWith(sw)) return false;
+    if(ew && !w.endsWith(ew)) return false;
+    if(cw && !w.includes(cw)) return false;
+    return canMake(w,letters);
+  }).sort((a,b)=>b.length-a.length||letterScore(b)-letterScore(a));
+
+  allResults={};
+  for(const w of found){const k=w.length;if(!allResults[k])allResults[k]=[];allResults[k].push(w);}
+  const lengths=Object.keys(allResults).map(Number).sort((a,b)=>b-a);
+  const lenFilter=document.getElementById('lengthFilter');
+  lenFilter.innerHTML='<option value="all">Alle</option>';
+  lengths.forEach(l=>{const o=document.createElement('option');o.value=l;o.textContent=`${l} bogstaver`;lenFilter.appendChild(o);});
+  document.getElementById('wordCount').textContent=found.length?`${found.length} ord`:'';
+  renderResults(found,raw,lengths);
+}
+
+function renderResults(found,letters,lengths){
+  const area=document.getElementById('results-area');
+  const noRes=document.getElementById('no-results');
+  if(!found.length){area.style.display='none';noRes.style.display='block';return;}
+  area.style.display='block';noRes.style.display='none';
+  document.getElementById('results-title').textContent=`Ord fra «${letters.toUpperCase()}»`;
+  document.getElementById('results-meta').textContent=`${found.length} ord fundet`;
+  const tabsEl=document.getElementById('length-tabs');
+  tabsEl.innerHTML='<span class="tab-btn active" onclick="switchTab(\'all\',this)">Alle</span>';
+  lengths.forEach(l=>{tabsEl.innerHTML+=`<span class="tab-btn" onclick="switchTab(${l},this)">${l} bogstaver (${allResults[l].length})</span>`;});
+  renderWords(found);
+}
+
+function switchTab(len,el){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const toShow=len==='all'?Object.values(allResults).flat():allResults[len]||[];
+  renderWords(toShow);
+}
+
+function renderWords(words){
+  const container=document.getElementById('words-container');
+  if(!words.length){container.innerHTML='';return;}
+  const byLen={};
+  for(const w of words){const k=w.length;if(!byLen[k])byLen[k]=[];byLen[k].push(w);}
+  const lens=Object.keys(byLen).map(Number).sort((a,b)=>b-a);
+  let html='';
+  for(const l of lens){
+    html+=`<div class="section-title">Ord med ${l} bogstaver (${byLen[l].length})</div><div class="words-grid">`;
+    for(const w of byLen[l]){html+=`<div class="word-card" onclick="copyWord('${w}')">${w.toUpperCase()}<br><span class="pts">${letterScore(w)} pt</span></div>`;}
+    html+='</div>';
+  }
+  container.innerHTML=html;
+}
+
+function filterByLength(){
+  const len=document.getElementById('lengthFilter').value;
+  const words=len==='all'?Object.values(allResults).flat():allResults[parseInt(len)]||[];
+  renderWords(words);
+}
+
+function copyWord(w){
+  navigator.clipboard?.writeText(w.toUpperCase()).catch(()=>{});
+  const t=document.getElementById('toast');
+  t.textContent=`✓ ${w.toUpperCase()} kopieret!`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+document.getElementById('letterInput').addEventListener('keydown',e=>{if(e.key==='Enter')unscramble();});
+</script>
+</body>
+</html>
